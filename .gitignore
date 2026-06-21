@@ -1,0 +1,35 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# Data & secrets
+data/
+*.db
+*.db-wal
+*.db-shm
+*.zst
+*.jsonl
+*.ndjson
+.env
+
+# Generated dashboard data
+frontend/public/snapshot.json
+
+# Frontend
+frontend/node_modules/
+frontend/dist/
+
+# QA reports (embed post titles + permalinks — keep out of the repo)
+reports/
+
+# OS
+.DS_Store

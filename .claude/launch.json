@@ -1,0 +1,19 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "dashboard",
+      "autoPort": false,
+      "runtimeExecutable": "npx",
+      "runtimeArgs": [
+        "-y",
+        "serve",
+        "-s",
+        "-l",
+        "8088",
+        "/Users/shawn/Documents/reddit-niw-approval-denial-citation-stats/frontend/dist"
+      ],
+      "port": 8088
+    }
+  ]
+}

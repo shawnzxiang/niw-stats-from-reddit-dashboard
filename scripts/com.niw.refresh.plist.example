@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Daily incremental refresh (ingest + classify + snapshot) via launchd.
+
+  Setup:
+    1. Edit the ABSOLUTE paths below to match your checkout.
+    2. cp scripts/com.niw.refresh.plist.example ~/Library/LaunchAgents/com.niw.refresh.plist
+    3. launchctl load ~/Library/LaunchAgents/com.niw.refresh.plist
+
+  cron equivalent:
+    0 8 * * * cd /ABS/PATH/reddit-niw-approval-denial-citation-stats && \
+              PYTHONPATH=src .venv/bin/niw refresh --backend claude-cli >> data/refresh.log 2>&1
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.niw.refresh</string>
+
+    <key>WorkingDirectory</key>
+    <string>/ABS/PATH/reddit-niw-approval-denial-citation-stats</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PYTHONPATH</key>
+        <string>src</string>
+    </dict>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/ABS/PATH/reddit-niw-approval-denial-citation-stats/.venv/bin/niw</string>
+        <string>refresh</string>
+        <string>--backend</string>
+        <string>claude-cli</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key><integer>8</integer>
+        <key>Minute</key><integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/ABS/PATH/reddit-niw-approval-denial-citation-stats/data/refresh.log</string>
+    <key>StandardErrorPath</key>
+    <string>/ABS/PATH/reddit-niw-approval-denial-citation-stats/data/refresh.err.log</string>
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Daily PUBLISH (compute + build + deploy to GitHub Pages) via launchd.
+
+  This is the "share it as a website" companion to com.niw.refresh.plist.example:
+  it runs scripts/publish.sh, which does ./compute.sh -> make build-frontend -> push gh-pages.
+
+  Setup:
+    1. Edit the ABSOLUTE paths below to match your checkout.
+    2. (optional) add a NIW_HEALTHCHECK_URL env var below for a dead-man's-switch
+       (sign up free at healthchecks.io; it emails you if a daily run is ever missed).
+    3. cp scripts/com.niw.publish.plist.example ~/Library/LaunchAgents/com.niw.publish.plist
+    4. launchctl load ~/Library/LaunchAgents/com.niw.publish.plist
+    5. launchctl start com.niw.publish        # run once now to verify end-to-end
+
+  Notes:
+    - launchd (unlike cron) runs a missed job on the next wake, so a sleeping laptop just
+      catches up — fine for a daily stats site.
+    - Logs go to data/publish.log / data/publish.err.log (below).
+
+  cron equivalent:
+    0 9 * * * /ABS/PATH/reddit-niw-approval-denial-citation-stats/scripts/publish.sh \
+              >> /ABS/PATH/reddit-niw-approval-denial-citation-stats/data/publish.log 2>&1
+-->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.niw.publish</string>
+
+    <key>WorkingDirectory</key>
+    <string>/ABS/PATH/reddit-niw-approval-denial-citation-stats</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <!-- Optional dead-man's-switch: paste your https://hc-ping.com/<uuid> here. -->
+        <key>NIW_HEALTHCHECK_URL</key>
+        <string></string>
+    </dict>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/ABS/PATH/reddit-niw-approval-denial-citation-stats/scripts/publish.sh</string>
+        <string>claude-cli</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key><integer>9</integer>
+        <key>Minute</key><integer>0</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/ABS/PATH/reddit-niw-approval-denial-citation-stats/data/publish.log</string>
+    <key>StandardErrorPath</key>
+    <string>/ABS/PATH/reddit-niw-approval-denial-citation-stats/data/publish.err.log</string>
+    <key>RunAtLoad</key>
+    <false/>
+</dict>
+</plist>

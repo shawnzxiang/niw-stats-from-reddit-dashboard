@@ -1,0 +1,977 @@
+{
+  "records": [
+    {
+      "id": null,
+      "title": null,
+      "permalink": null,
+      "flair": null,
+      "created_utc": 1000,
+      "outcome": "approved",
+      "degree": "PhD",
+      "field": "CS/AI",
+      "law_firm": "DIY/Self-petition",
+      "publications": [
+        3,
+        true
+      ],
+      "citations": [
+        0,
+        true
+      ],
+      "years_experience": [
+        6.0,
+        true
+      ],
+      "processing_days": [
+        90,
+        true
+      ],
+      "premium_processing": true,
+      "was_rfed": false,
+      "rfe_date": null,
+      "rfe_response_date": null
+    },
+    {
+      "id": null,
+      "title": null,
+      "permalink": null,
+      "flair": null,
+      "created_utc": 2000,
+      "outcome": "denied",
+      "degree": "Masters",
+      "field": "Biology",
+      "law_firm": null,
+      "publications": [
+        null,
+        false
+      ],
+      "citations": [
+        50,
+        true
+      ],
+      "years_experience": [
+        null,
+        false
+      ],
+      "processing_days": [
+        null,
+        false
+      ],
+      "premium_processing": false,
+      "was_rfed": true,
+      "rfe_date": null,
+      "rfe_response_date": null
+    },
+    {
+      "id": null,
+      "title": null,
+      "permalink": null,
+      "flair": null,
+      "created_utc": 3000,
+      "outcome": "approved",
+      "degree": "PhD",
+      "field": null,
+      "law_firm": null,
+      "publications": [
+        null,
+        false
+      ],
+      "citations": [
+        null,
+        false
+      ],
+      "years_experience": [
+        null,
+        false
+      ],
+      "processing_days": [
+        null,
+        false
+      ],
+      "premium_processing": null,
+      "was_rfed": null,
+      "rfe_date": null,
+      "rfe_response_date": null
+    },
+    {
+      "id": null,
+      "title": null,
+      "permalink": null,
+      "flair": null,
+      "created_utc": 4000,
+      "outcome": "approved",
+      "degree": null,
+      "field": null,
+      "law_firm": null,
+      "publications": [
+        null,
+        false
+      ],
+      "citations": [
+        1500,
+        true
+      ],
+      "years_experience": [
+        null,
+        false
+      ],
+      "processing_days": [
+        400,
+        true
+      ],
+      "premium_processing": true,
+      "was_rfed": null,
+      "rfe_date": null,
+      "rfe_response_date": null
+    },
+    {
+      "id": null,
+      "title": null,
+      "permalink": null,
+      "flair": null,
+      "created_utc": 5000,
+      "outcome": "denied",
+      "degree": "Bachelors",
+      "field": null,
+      "law_firm": "Chen/WeGreened",
+      "publications": [
+        null,
+        false
+      ],
+      "citations": [
+        5,
+        true
+      ],
+      "years_experience": [
+        null,
+        false
+      ],
+      "processing_days": [
+        null,
+        false
+      ],
+      "premium_processing": null,
+      "was_rfed": true,
+      "rfe_date": null,
+      "rfe_response_date": null
+    }
+  ],
+  "cases": [
+    {
+      "name": "dist_degree",
+      "fn": "distribution",
+      "args": [
+        "degree",
+        false
+      ],
+      "expected": {
+        "metric": "degree",
+        "kind": "categorical",
+        "buckets": [
+          {
+            "label": "PhD",
+            "count": 2,
+            "approved": 2,
+            "denied": 0
+          },
+          {
+            "label": "Masters",
+            "count": 1,
+            "approved": 0,
+            "denied": 1
+          },
+          {
+            "label": "Bachelors",
+            "count": 1,
+            "approved": 0,
+            "denied": 1
+          },
+          {
+            "label": "Unknown",
+            "count": 1,
+            "approved": 1,
+            "denied": 0
+          }
+        ],
+        "unknown_count": 1,
+        "n": 4,
+        "total": 5
+      }
+    },
+    {
+      "name": "dist_citations_show",
+      "fn": "distribution",
+      "args": [
+        "citations",
+        false
+      ],
+      "expected": {
+        "metric": "citations",
+        "kind": "numeric",
+        "buckets": [
+          {
+            "label": "0",
+            "count": 1,
+            "approved": 1,
+            "denied": 0
+          },
+          {
+            "label": "1–10",
+            "count": 1,
+            "approved": 0,
+            "denied": 1
+          },
+          {
+            "label": "11–20",
+            "count": 0,
+            "approved": 0,
+            "denied": 0
+          },
+          {
+            "label": "21–30",
+            "count": 0,
+            "approved": 0,
+            "denied": 0
+          },
+          {
+            "label": "31–50",
+            "count": 1,
+            "approved": 0,
+            "denied": 1
+          },
+          {
+            "label": "51–100",
+            "count": 0,
+            "approved": 0,
+            "denied": 0
+          },
+          {
+            "label": "101–200",
+            "count": 0,
+            "approved": 0,
+            "denied": 0
+          },
+          {
+            "label": "201–500",
+            "count": 0,
+            "approved": 0,
+            "denied": 0
+          },
+          {
+            "label": "501+",
+            "count": 1,
+            "approved": 1,
+            "denied": 0
+          },
+          {
+            "label": "Unknown",
+            "count": 1,
+            "approved": 1,
+            "denied": 0
+          }
+        ],
+        "unknown_count": 1,
+        "n": 4,
+        "total": 5
+      }
+    },
+    {
+      "name": "dist_citations_hide",
+      "fn": "distribution",
+      "args": [
+        "citations",
+        true
+      ],
+      "expected": {
+        "metric": "citations",
+        "kind": "numeric",
+        "buckets": [
+          {
+            "label": "0",
+            "count": 1,
+            "approved": 1,
+            "denied": 0
+          },
+          {
+            "label": "1–10",
+            "count": 1,
+            "approved": 0,
+            "denied": 1
+          },
+          {
+            "label": "11–20",
+            "count": 0,
+            "approved": 0,
+            "denied": 0
+          },
+          {
+            "label": "21–30",
+            "count": 0,
+            "approved": 0,
+            "denied": 0
+          },
+          {
+            "label": "31–50",
+            "count": 1,
+            "approved": 0,
+            "denied": 1
+          },
+          {
+            "label": "51–100",
+            "count": 0,
+            "approved": 0,
+            "denied": 0
+          },
+          {
+            "label": "101–200",
+            "count": 0,
+            "approved": 0,
+            "denied": 0
+          },
+          {
+            "label": "201–500",
+            "count": 0,
+            "approved": 0,
+            "denied": 0
+          },
+          {
+            "label": "501+",
+            "count": 1,
+            "approved": 1,
+            "denied": 0
+          }
+        ],
+        "unknown_count": 1,
+        "n": 4,
+        "total": 5
+      }
+    },
+    {
+      "name": "dist_processing",
+      "fn": "distribution",
+      "args": [
+        "processing_days",
+        false
+      ],
+      "expected": {
+        "metric": "processing_days",
+        "kind": "duration",
+        "buckets": [
+          {
+            "label": "0–30",
+            "count": 0,
+            "approved": 0,
+            "denied": 0
+          },
+          {
+            "label": "31–60",
+            "count": 0,
+            "approved": 0,
+            "denied": 0
+          },
+          {
+            "label": "61–90",
+            "count": 1,
+            "approved": 1,
+            "denied": 0
+          },
+          {
+            "label": "91–120",
+            "count": 0,
+            "approved": 0,
+            "denied": 0
+          },
+          {
+            "label": "121–180",
+            "count": 0,
+            "approved": 0,
+            "denied": 0
+          },
+          {
+            "label": "181–365",
+            "count": 0,
+            "approved": 0,
+            "denied": 0
+          },
+          {
+            "label": "365+",
+            "count": 1,
+            "approved": 1,
+            "denied": 0
+          },
+          {
+            "label": "Unknown",
+            "count": 3,
+            "approved": 1,
+            "denied": 2
+          }
+        ],
+        "unknown_count": 3,
+        "n": 2,
+        "total": 5
+      }
+    },
+    {
+      "name": "dist_lawfirm",
+      "fn": "distribution",
+      "args": [
+        "law_firm",
+        false
+      ],
+      "expected": {
+        "metric": "law_firm",
+        "kind": "categorical",
+        "buckets": [
+          {
+            "label": "DIY/Self-petition",
+            "count": 1,
+            "approved": 1,
+            "denied": 0
+          },
+          {
+            "label": "Chen/WeGreened",
+            "count": 1,
+            "approved": 0,
+            "denied": 1
+          },
+          {
+            "label": "Unknown",
+            "count": 3,
+            "approved": 2,
+            "denied": 1
+          }
+        ],
+        "unknown_count": 3,
+        "n": 2,
+        "total": 5
+      }
+    },
+    {
+      "name": "dist_premium",
+      "fn": "distribution",
+      "args": [
+        "premium",
+        false
+      ],
+      "expected": {
+        "metric": "premium",
+        "kind": "categorical",
+        "buckets": [
+          {
+            "label": "Premium",
+            "count": 2,
+            "approved": 2,
+            "denied": 0
+          },
+          {
+            "label": "Regular",
+            "count": 1,
+            "approved": 0,
+            "denied": 1
+          },
+          {
+            "label": "Unknown",
+            "count": 2,
+            "approved": 1,
+            "denied": 1
+          }
+        ],
+        "unknown_count": 2,
+        "n": 3,
+        "total": 5
+      }
+    },
+    {
+      "name": "dist_rfe",
+      "fn": "distribution",
+      "args": [
+        "rfe",
+        false
+      ],
+      "expected": {
+        "metric": "rfe",
+        "kind": "categorical",
+        "buckets": [
+          {
+            "label": "RFE'd",
+            "count": 2,
+            "approved": 0,
+            "denied": 2
+          },
+          {
+            "label": "No RFE",
+            "count": 1,
+            "approved": 1,
+            "denied": 0
+          },
+          {
+            "label": "Unknown",
+            "count": 2,
+            "approved": 2,
+            "denied": 0
+          }
+        ],
+        "unknown_count": 2,
+        "n": 3,
+        "total": 5
+      }
+    },
+    {
+      "name": "approval",
+      "fn": "approval_rate",
+      "args": [],
+      "expected": {
+        "approved": 3,
+        "denied": 2,
+        "total_decided": 5,
+        "rate": 0.6
+      }
+    },
+    {
+      "name": "by_degree",
+      "fn": "approval_rate_by_group",
+      "args": [
+        "degree",
+        false
+      ],
+      "expected": {
+        "group": "degree",
+        "groups": [
+          {
+            "label": "PhD",
+            "approved": 2,
+            "denied": 0,
+            "n": 2,
+            "rate": 1.0
+          },
+          {
+            "label": "Masters",
+            "approved": 0,
+            "denied": 1,
+            "n": 1,
+            "rate": 0.0
+          },
+          {
+            "label": "Bachelors",
+            "approved": 0,
+            "denied": 1,
+            "n": 1,
+            "rate": 0.0
+          },
+          {
+            "label": "Unknown",
+            "approved": 1,
+            "denied": 0,
+            "n": 1,
+            "rate": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "name": "by_citbucket",
+      "fn": "approval_rate_by_group",
+      "args": [
+        "citation_bucket",
+        false
+      ],
+      "expected": {
+        "group": "citation_bucket",
+        "groups": [
+          {
+            "label": "0",
+            "approved": 1,
+            "denied": 0,
+            "n": 1,
+            "rate": 1.0
+          },
+          {
+            "label": "1–10",
+            "approved": 0,
+            "denied": 1,
+            "n": 1,
+            "rate": 0.0
+          },
+          {
+            "label": "31–50",
+            "approved": 0,
+            "denied": 1,
+            "n": 1,
+            "rate": 0.0
+          },
+          {
+            "label": "501+",
+            "approved": 1,
+            "denied": 0,
+            "n": 1,
+            "rate": 1.0
+          },
+          {
+            "label": "Unknown",
+            "approved": 1,
+            "denied": 0,
+            "n": 1,
+            "rate": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "name": "by_premium",
+      "fn": "approval_rate_by_group",
+      "args": [
+        "premium",
+        false
+      ],
+      "expected": {
+        "group": "premium",
+        "groups": [
+          {
+            "label": "Premium",
+            "approved": 2,
+            "denied": 0,
+            "n": 2,
+            "rate": 1.0
+          },
+          {
+            "label": "Regular",
+            "approved": 0,
+            "denied": 1,
+            "n": 1,
+            "rate": 0.0
+          },
+          {
+            "label": "Unknown",
+            "approved": 1,
+            "denied": 1,
+            "n": 2,
+            "rate": 0.5
+          }
+        ]
+      }
+    },
+    {
+      "name": "by_rfe",
+      "fn": "approval_rate_by_group",
+      "args": [
+        "rfe",
+        false
+      ],
+      "expected": {
+        "group": "rfe",
+        "groups": [
+          {
+            "label": "RFE'd",
+            "approved": 0,
+            "denied": 2,
+            "n": 2,
+            "rate": 0.0
+          },
+          {
+            "label": "No RFE",
+            "approved": 1,
+            "denied": 0,
+            "n": 1,
+            "rate": 1.0
+          },
+          {
+            "label": "Unknown",
+            "approved": 2,
+            "denied": 0,
+            "n": 2,
+            "rate": 1.0
+          }
+        ]
+      }
+    },
+    {
+      "name": "window_filter",
+      "fn": "filter_count",
+      "args": [
+        1500,
+        3500
+      ],
+      "expected": 2
+    }
+  ],
+  "window_from_range": {
+    "key": "3m",
+    "now": 1000000,
+    "expected": [
+      -6776000,
+      1000000
+    ]
+  },
+  "select_view": {
+    "records": [
+      {
+        "id": "p1",
+        "title": "post p1",
+        "permalink": "/r/EB2_NIW/comments/p1/",
+        "flair": null,
+        "created_utc": 2000,
+        "outcome": "approved",
+        "degree": null,
+        "field": null,
+        "law_firm": null,
+        "publications": [
+          null,
+          false
+        ],
+        "citations": [
+          null,
+          false
+        ],
+        "years_experience": [
+          null,
+          false
+        ],
+        "processing_days": [
+          null,
+          false
+        ],
+        "premium_processing": null,
+        "was_rfed": null,
+        "rfe_date": null,
+        "rfe_response_date": null,
+        "run": "claude-cli/sonnet",
+        "classified_at": 10
+      },
+      {
+        "id": "p1",
+        "title": "post p1",
+        "permalink": "/r/EB2_NIW/comments/p1/",
+        "flair": null,
+        "created_utc": 2000,
+        "outcome": "approved",
+        "degree": null,
+        "field": null,
+        "law_firm": null,
+        "publications": [
+          null,
+          false
+        ],
+        "citations": [
+          null,
+          false
+        ],
+        "years_experience": [
+          null,
+          false
+        ],
+        "processing_days": [
+          null,
+          false
+        ],
+        "premium_processing": null,
+        "was_rfed": null,
+        "rfe_date": null,
+        "rfe_response_date": null,
+        "run": "claude-cli/haiku",
+        "classified_at": 20
+      },
+      {
+        "id": "p1",
+        "title": "post p1",
+        "permalink": "/r/EB2_NIW/comments/p1/",
+        "flair": null,
+        "created_utc": 2000,
+        "outcome": "denied",
+        "degree": null,
+        "field": null,
+        "law_firm": null,
+        "publications": [
+          null,
+          false
+        ],
+        "citations": [
+          null,
+          false
+        ],
+        "years_experience": [
+          null,
+          false
+        ],
+        "processing_days": [
+          null,
+          false
+        ],
+        "premium_processing": null,
+        "was_rfed": null,
+        "rfe_date": null,
+        "rfe_response_date": null,
+        "run": "codex-cli/codex",
+        "classified_at": 30
+      },
+      {
+        "id": "p2",
+        "title": "post p2",
+        "permalink": "/r/EB2_NIW/comments/p2/",
+        "flair": null,
+        "created_utc": 1000,
+        "outcome": "denied",
+        "degree": null,
+        "field": null,
+        "law_firm": null,
+        "publications": [
+          null,
+          false
+        ],
+        "citations": [
+          null,
+          false
+        ],
+        "years_experience": [
+          null,
+          false
+        ],
+        "processing_days": [
+          null,
+          false
+        ],
+        "premium_processing": null,
+        "was_rfed": null,
+        "rfe_date": null,
+        "rfe_response_date": null,
+        "run": "claude-cli/sonnet",
+        "classified_at": 11
+      },
+      {
+        "id": "p2",
+        "title": "post p2",
+        "permalink": "/r/EB2_NIW/comments/p2/",
+        "flair": null,
+        "created_utc": 1000,
+        "outcome": "approved",
+        "degree": null,
+        "field": null,
+        "law_firm": null,
+        "publications": [
+          null,
+          false
+        ],
+        "citations": [
+          null,
+          false
+        ],
+        "years_experience": [
+          null,
+          false
+        ],
+        "processing_days": [
+          null,
+          false
+        ],
+        "premium_processing": null,
+        "was_rfed": null,
+        "rfe_date": null,
+        "rfe_response_date": null,
+        "run": "claude-cli/haiku",
+        "classified_at": 99
+      }
+    ],
+    "cases": [
+      {
+        "run": "composite",
+        "expected": [
+          {
+            "id": "p1",
+            "outcome": "approved",
+            "run": "claude-cli/haiku"
+          },
+          {
+            "id": "p2",
+            "outcome": "approved",
+            "run": "claude-cli/haiku"
+          }
+        ]
+      },
+      {
+        "run": "claude-cli/haiku",
+        "expected": [
+          {
+            "id": "p1",
+            "outcome": "approved",
+            "run": "claude-cli/haiku"
+          },
+          {
+            "id": "p2",
+            "outcome": "approved",
+            "run": "claude-cli/haiku"
+          }
+        ]
+      }
+    ]
+  },
+  "mark_refiled": {
+    "records": [
+      {
+        "id": "d1",
+        "author": "alice",
+        "outcome": "denied",
+        "created_utc": 100,
+        "permalink": "/d1"
+      },
+      {
+        "id": "a1",
+        "author": "alice",
+        "outcome": "approved",
+        "created_utc": 200,
+        "permalink": "/a1"
+      },
+      {
+        "id": "b1",
+        "author": "bob",
+        "outcome": "denied",
+        "created_utc": 100,
+        "permalink": "/b1"
+      },
+      {
+        "id": "x1",
+        "author": "[deleted]",
+        "outcome": "denied",
+        "created_utc": 100,
+        "permalink": "/x1"
+      },
+      {
+        "id": "x2",
+        "author": "[deleted]",
+        "outcome": "approved",
+        "created_utc": 200,
+        "permalink": "/x2"
+      }
+    ],
+    "expected": [
+      {
+        "id": "d1",
+        "refiled": true,
+        "refiled_url": "/a1",
+        "refile_approval": null
+      },
+      {
+        "id": "a1",
+        "refiled": null,
+        "refiled_url": null,
+        "refile_approval": true
+      },
+      {
+        "id": "b1",
+        "refiled": null,
+        "refiled_url": null,
+        "refile_approval": null
+      },
+      {
+        "id": "x1",
+        "refiled": null,
+        "refiled_url": null,
+        "refile_approval": null
+      },
+      {
+        "id": "x2",
+        "refiled": null,
+        "refiled_url": null,
+        "refile_approval": null
+      }
+    ]
+  }
+}

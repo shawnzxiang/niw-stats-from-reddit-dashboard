@@ -15,7 +15,13 @@ from typing import Any
 from niw_stats.classify import service
 from niw_stats.config import Settings
 from niw_stats.db import repository as repo
-from niw_stats.stats.aggregate import content_fingerprint, record_from_row, to_slim
+from niw_stats.stats.aggregate import (
+    content_fingerprint,
+    mark_refiled,
+    record_from_row,
+    to_slim,
+    to_slim_public,
+)
 
 
 def compute_data_version(
@@ -84,7 +90,12 @@ def build_snapshot(conn: sqlite3.Connection, settings: Settings, *, generated_at
     pv, sv, view_run = service.active_identity(settings, conn)
     # Carry every version's ok records so the client can audit older prompt/schema runs offline.
     records = [record_from_row(r) for r in repo.get_all_ok_records_all_versions(conn)]
-    all_records = [to_slim(r) for r in records]
+    if settings.public_snapshot:
+        # Compute re-file flags from the username BEFORE it's stripped, then PII-scrub each record.
+        mark_refiled(records)
+        all_records = [to_slim_public(r) for r in records]
+    else:
+        all_records = [to_slim(r) for r in records]
     all_runs = repo.list_runs_all_versions(conn)
     versions_seen = repo.list_versions(conn)
     versions = [

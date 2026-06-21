@@ -98,6 +98,31 @@ def test_snapshot_carries_older_prompt_schema_versions(db):
                for r in snap["meta"]["all_runs"])
 
 
+def test_public_snapshot_strips_pii_and_keeps_refile(db):
+    pv, sv = service.PROMPT_VERSION, service.SCHEMA_VERSION
+    repo.upsert_raw_posts(db, [
+        make_raw("d1", is_candidate=1, author="bob", selftext="reach me at bob@example.com",
+                 created_utc=100, permalink="/r/EB2_NIW/comments/d1/"),
+        make_raw("a1", is_candidate=1, author="bob", selftext="approved on re-file!",
+                 created_utc=200, permalink="/r/EB2_NIW/comments/a1/"),
+    ])
+    repo.upsert_classification(db, make_cls("d1", prompt_version=pv, schema_version=sv,
+                                            classified_at=1, outcome="denied"))
+    repo.upsert_classification(db, make_cls("a1", prompt_version=pv, schema_version=sv,
+                                            classified_at=2, outcome="approved"))
+
+    pub = snapshot.build_snapshot(db, Settings(classifier_backend="mock", public_snapshot=True),
+                                  generated_at=1)
+    for r in pub["records"]:  # PII gone from every record
+        assert "author" not in r and "selftext" not in r and "op_comments" not in r
+    denied = next(r for r in pub["records"] if r["id"] == "d1")
+    assert denied["refiled"] is True  # computed server-side before the username was stripped
+    assert denied["refiled_url"] == "/r/EB2_NIW/comments/a1/"
+
+    full = snapshot.build_snapshot(db, SETTINGS, generated_at=1)  # default still carries body+author
+    assert "author" in full["records"][0] and "selftext" in full["records"][0]
+
+
 def test_write_snapshot_to_file(db, tmp_path):
     repo.upsert_raw_posts(db, [make_raw("a", is_candidate=1, title="NIW approved", selftext="Approved! NIW.")])
     service.classify_pending(db, settings=SETTINGS, now=1)

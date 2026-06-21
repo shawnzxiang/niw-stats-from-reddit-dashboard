@@ -57,6 +57,9 @@ class Settings(BaseSettings):
 
     # Output
     snapshot_path: Path = Path("frontend/public/snapshot.json")
+    # When set (NIW_PUBLIC_SNAPSHOT=1), the snapshot drops PII (post body, OP comments, username)
+    # for public hosting. Re-file flags are computed server-side first so the badge still works.
+    public_snapshot: bool = False
 
 
 @lru_cache

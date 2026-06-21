@@ -156,6 +156,22 @@ def to_slim(r: Record) -> dict[str, Any]:
     }
 
 
+# Fields dropped from the PUBLIC snapshot (NIW_PUBLIC_SNAPSHOT=1): the re-hosted post body,
+# the OP's comments, and the Reddit username. All detected PII lives in the body/comments, and
+# dropping author stops the published file from being a username->outcome index. Re-file flags
+# (refiled/refiled_url) are computed server-side via mark_refiled() BEFORE slimming, so the badge
+# survives the loss of `author`. Title + permalink stay (the "keep links" choice).
+_PUBLIC_DROP = ("selftext", "op_comments", "author")
+
+
+def to_slim_public(r: Record) -> dict[str, Any]:
+    """PII-scrubbed slim form for the public snapshot — to_slim minus body/comments/username."""
+    d = to_slim(r)
+    for k in _PUBLIC_DROP:
+        d.pop(k, None)
+    return d
+
+
 def record_from_slim(d: dict[str, Any]) -> Record:
     pub = d.get("publications") or [None, False]
     pat = d.get("patents") or [None, False]

@@ -18,6 +18,11 @@
 set -euo pipefail
 cd "$(dirname "$0")/.."          # repo root (scripts/ is one level down)
 
+# Publish the PII-scrubbed snapshot: drops post body, OP comments, and username (all detected
+# PII lives in the body text). Re-file flags are computed server-side before the username is
+# stripped. A local `./compute.sh` without this env still writes the full snapshot for dev.
+export NIW_PUBLIC_SNAPSHOT=1
+
 BACKEND="${1:-claude-cli}"
 HEALTHCHECK_URL="${NIW_HEALTHCHECK_URL:-}"
 
@@ -31,6 +36,10 @@ echo "===== publish start: $(date -u '+%Y-%m-%dT%H:%M:%SZ')  backend=${BACKEND} 
 #    snapshot.json into frontend/dist. With base="./" in vite.config.ts the asset paths are relative,
 #    so the build works under the GitHub Pages /<repo>/ subpath.
 make build-frontend
+
+# 2b. Safety gate: refuse to deploy if the built snapshot still carries PII (a regression guard
+#     in case NIW_PUBLIC_SNAPSHOT is ever unset or to_slim_public changes). Aborts before push.
+.venv/bin/python scripts/pii_audit.py frontend/dist/snapshot.json --assert-clean
 
 # 3. Deploy: publish frontend/dist as a single-commit gh-pages branch on origin.
 #    Vite wipes dist/ on every build, so the throwaway git repo created here is always clean.

@@ -143,6 +143,10 @@ const AUTHOR_SKIP = new Set(["", "[deleted]", "[removed]", "AutoModerator"]);
 
 /** Flag denied cases whose author was later approved (a re-file), from records alone. */
 export function markRefiled(records: SlimRecord[]): SlimRecord[] {
+  // The public snapshot strips `author` and ships server-computed refiled/refiled_url instead.
+  // Without usernames we can't (and shouldn't) recompute — preserve the server flags as-is.
+  const hasAuthors = records.some((r) => r.author && !AUTHOR_SKIP.has(r.author));
+  if (!hasAuthors) return records;
   for (const r of records) {
     r.refiled = null;
     r.refiled_url = null;

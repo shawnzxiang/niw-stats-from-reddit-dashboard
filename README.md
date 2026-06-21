@@ -1,4 +1,4 @@
-# NIW Stats — r/EB2_NIW approval/denial data
+# NIW Stats Reddit r/EB2_NIW approval/denial data
 
 Pull EB-2 NIW (I-140 National Interest Waiver) **approval/denial** data points shared on
 [r/EB2_NIW](https://www.reddit.com/r/EB2_NIW/), have an LLM extract structured fields from each

@@ -69,13 +69,16 @@ export function DistributionChart({ dist, horizontal = false, onSelect }: Props)
     return <div className="center">no data in range</div>;
   }
 
+  // The end-of-bar number is the approval rate. Render it in the "approved" green and bold so it
+  // reads as "% approved" rather than a share of the bar's length (which is volume). See the legend.
   const rateLabel = (
     <LabelList
       dataKey="rate"
       position={horizontal ? "right" : "top"}
       formatter={rateText}
       fontSize={10}
-      fill="var(--ink)"
+      fontWeight={700}
+      fill={GREEN}
     />
   );
 

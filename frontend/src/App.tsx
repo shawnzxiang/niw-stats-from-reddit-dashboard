@@ -375,7 +375,9 @@ export default function App() {
       <div className="legend" style={{ display: "flex", gap: 16, fontSize: 12, color: "var(--muted)", margin: "4px 2px 10px" }}>
         <span><span style={{ display: "inline-block", width: 11, height: 11, borderRadius: 3, background: "#30a46c", verticalAlign: "-1px" }} /> approved</span>
         <span><span style={{ display: "inline-block", width: 11, height: 11, borderRadius: 3, background: "#e5484d", verticalAlign: "-1px" }} /> denied</span>
-        <span className="muted">click a bar to filter (incl. Unknown / Other) · bar length = volume</span>
+        <span className="muted">
+          <b style={{ color: "#30a46c" }}>%</b> on each bar = <b style={{ color: "#30a46c" }}>approval rate</b> · bar length = volume · click a bar to filter
+        </span>
       </div>
 
       <div className="card" style={{ marginBottom: 16 }}>

@@ -404,6 +404,27 @@ export function applyFilters(records: SlimRecord[], filters: Filters): SlimRecor
   return records.filter((r) => recordMatchesFilters(r, filters));
 }
 
+/** Distinct filter values for a metric — the options for a filter dropdown.
+ *  Numeric metrics are ordered by bin; categorical by frequency; Unknown always last. */
+export function distinctValues(records: SlimRecord[], metric: string): string[] {
+  const counts = new Map<string, number>();
+  for (const r of records) {
+    const v = fieldValue(r, metric);
+    counts.set(v, (counts.get(v) ?? 0) + 1);
+  }
+  const entries = [...counts.entries()];
+  const num = NUMERIC[metric];
+  if (num) {
+    const order = new Map(num.bins.map((b, i) => [b[0], i] as const));
+    const rank = (l: string) => (l === UNKNOWN ? 1e6 : order.get(l) ?? 1e5);
+    entries.sort((a, b) => rank(a[0]) - rank(b[0]));
+  } else {
+    const unk = (l: string) => (l === UNKNOWN ? 1 : 0);
+    entries.sort((a, b) => unk(a[0]) - unk(b[0]) || b[1] - a[1]);
+  }
+  return entries.map(([label]) => label);
+}
+
 // Human-readable label for a filter field (for chips).
 export const FIELD_LABELS: Record<string, string> = {
   outcome: "Outcome",

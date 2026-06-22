@@ -9,6 +9,8 @@ interface Props {
   color?: string;
   onSelect?: (label: string) => void;
   selected?: string | null;
+  /** Phone layout: bars are too narrow for "78% approved", so label them just "78%". */
+  compact?: boolean;
 }
 
 const GREEN = APPROVED;
@@ -25,8 +27,10 @@ interface Row {
   rate: number | null;
 }
 
-function rateText(v: number | null | undefined): string {
-  return v == null ? "" : `${Math.round(v * 100)}%`;
+function rateText(v: number | null | undefined, compact: boolean): string {
+  if (v == null) return "";
+  const pct = Math.round(v * 100);
+  return compact ? `${pct}%` : `${pct}% approved`;
 }
 
 function RateTooltip({ active, payload, label }: {
@@ -49,7 +53,7 @@ function RateTooltip({ active, payload, label }: {
 
 // Bars are split by outcome: approved (green) + denied (red) + outcome-unknown (gray),
 // stacked so the total length is the volume; the approval rate is labelled at each bar's end.
-export function DistributionChart({ dist, horizontal = false, onSelect }: Props) {
+export function DistributionChart({ dist, horizontal = false, onSelect, compact = false }: Props) {
   const data: Row[] = dist.buckets.map((b) => {
     const decided = b.approved + b.denied;
     return {
@@ -69,23 +73,23 @@ export function DistributionChart({ dist, horizontal = false, onSelect }: Props)
     return <div className="center">no data in range</div>;
   }
 
-  // The end-of-bar number is the approval rate. Render it in the "approved" green and bold so it
-  // reads as "% approved" rather than a share of the bar's length (which is volume). See the legend.
+  // The end-of-bar label spells out the approval rate ("78% approved") so it can't be mistaken for a
+  // share of the bar's length (which is volume). On phones it collapses to "78%" (the legend carries
+  // the meaning). Neutral ink — the green read as a data color.
   const rateLabel = (
     <LabelList
       dataKey="rate"
       position={horizontal ? "right" : "top"}
-      formatter={rateText}
-      fontSize={10}
-      fontWeight={700}
-      fill={GREEN}
+      formatter={(v: number | null | undefined) => rateText(v, compact)}
+      fontSize={9}
+      fill="var(--ink)"
     />
   );
 
   if (horizontal) {
     return (
       <ResponsiveContainer width="100%" height={Math.max(160, data.length * 30)}>
-        <BarChart data={data} layout="vertical" margin={{ left: 12, right: 40, top: 4, bottom: 4 }} onClick={chartClick}>
+        <BarChart data={data} layout="vertical" margin={{ left: 12, right: compact ? 36 : 76, top: 4, bottom: 4 }} onClick={chartClick}>
           <XAxis type="number" allowDecimals={false} tick={{ fontSize: 11, fill: AXIS }} axisLine={false} tickLine={false} />
           <YAxis type="category" dataKey="label" width={130} tick={{ fontSize: 12, fill: AXIS }} axisLine={false} tickLine={false} />
           <Tooltip content={<RateTooltip />} cursor={{ fill: "rgba(0,0,0,0.035)" }} />

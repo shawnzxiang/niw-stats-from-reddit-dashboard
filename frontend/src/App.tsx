@@ -4,6 +4,7 @@ import { loadSnapshot } from "./api/client";
 import { ChartCard } from "./components/ChartCard";
 import { BiasBanner, CompletenessStrip, DataQualityBanner } from "./components/DataQuality";
 import { DistributionChart } from "./components/DistributionChart";
+import { FilterBar } from "./components/FilterBar";
 import { PostList } from "./components/PostList";
 import { StatCards } from "./components/StatCards";
 import { TimeRangeSelector } from "./components/TimeRangeSelector";
@@ -62,7 +63,25 @@ function toEpoch(dateStr: string, endOfDay: boolean): number | null {
   return Math.floor(ms / 1000) + (endOfDay ? 86_400 - 1 : 0);
 }
 
+/** Reactive media-query hook — re-renders when the viewport crosses the breakpoint. */
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(
+    () => typeof window !== "undefined" && window.matchMedia(query).matches,
+  );
+  useEffect(() => {
+    const mql = window.matchMedia(query);
+    const onChange = () => setMatches(mql.matches);
+    onChange();
+    mql.addEventListener("change", onChange);
+    return () => mql.removeEventListener("change", onChange);
+  }, [query]);
+  return matches;
+}
+
 export default function App() {
+  // On phones the charts are too narrow for the full "78% approved" bar labels, so collapse them
+  // to a compact "78%" and surface the meaning in the legend instead.
+  const compact = useMediaQuery("(max-width: 560px)");
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [rangeKey, setRangeKey] = useState("24m");
@@ -221,6 +240,15 @@ export default function App() {
     setFilters((f) => ({ ...pick(f, "outcome") }));
     setOthers({});
   };
+  // Dropdown filters set a metric to an exact value (or clear it); also drop any "Other tail" facet.
+  const setFilter = (metric: string, value: string | null) => {
+    setOthers((o) => {
+      if (!o[metric]) return o;
+      const { [metric]: _drop, ...rest } = o;
+      return rest;
+    });
+    setFilters((f) => (value ? { ...f, [metric]: value } : omit(f, metric)));
+  };
   const facetChips: [string, string][] = [
     ...Object.entries(filters).filter(([k]) => k !== "outcome"),
     ...Object.keys(others).map((m) => [m, OTHERS] as [string, string]),
@@ -331,6 +359,8 @@ export default function App() {
         </label>
       </div>
 
+      <FilterBar records={viewRecords} filters={filters} onChange={setFilter} onClear={clearFacets} />
+
       {showQuarters && quarterOptions.length > 1 && (
         <div className="chips" style={{ alignItems: "center" }}>
           <span className="muted" title="Filter by calendar quarter of the post date — overrides the range above">By quarter:</span>
@@ -372,11 +402,11 @@ export default function App() {
         approval rate is biased high and likely overstates real approval odds.
       </p>
 
-      <div className="legend" style={{ display: "flex", gap: 16, fontSize: 12, color: "var(--muted)", margin: "4px 2px 10px" }}>
+      <div className="legend" style={{ display: "flex", flexWrap: "wrap", gap: "4px 16px", fontSize: 12, color: "var(--muted)", margin: "4px 2px 10px" }}>
         <span><span style={{ display: "inline-block", width: 11, height: 11, borderRadius: 3, background: "#30a46c", verticalAlign: "-1px" }} /> approved</span>
         <span><span style={{ display: "inline-block", width: 11, height: 11, borderRadius: 3, background: "#e5484d", verticalAlign: "-1px" }} /> denied</span>
         <span className="muted">
-          <b style={{ color: "#30a46c" }}>%</b> on each bar = <b style={{ color: "#30a46c" }}>approval rate</b> · bar length = volume · click a bar to filter
+          {compact ? "% = approved · " : ""}bar length = volume · {compact ? "tap" : "click"} a bar to filter
         </span>
       </div>
 
@@ -405,6 +435,7 @@ export default function App() {
               <DistributionChart
                 dist={dist}
                 horizontal={c.horizontal}
+                compact={compact}
                 onSelect={(label) =>
                   label === OTHERS
                     ? toggleOther(

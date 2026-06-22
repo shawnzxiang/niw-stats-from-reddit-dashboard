@@ -4,13 +4,13 @@ A simple dashboard of self-reported **EB-2 NIW (I-140 National Interest Waiver)*
 denials shared on [r/EB2_NIW](https://www.reddit.com/r/EB2_NIW/) — so you can see what kinds of
 profiles file, and how they tend to fare.
 
-### 🔗 [Open the live dashboard »](https://shawnzxiang.github.io/niw-stats-from-reddit-dashboard/)
+### 🔗 [Open the live dashboard: ](https://shawnzxiang.github.io/niw-stats-from-reddit-dashboard/)
 
 [![Star on GitHub](https://img.shields.io/github/stars/shawnzxiang/niw-stats-from-reddit-dashboard?style=social)](https://github.com/shawnzxiang/niw-stats-from-reddit-dashboard)
 
 ⭐ **Found this useful? Please star the repo** — it helps others in the immigration community find it.
 
-![NIW Stats dashboard — approval/denial distributions for r/EB2_NIW](docs/screenshot.png)
+![NIW Stats dashboard - approval/denial distributions for r/EB2_NIW](docs/screenshot.png)
 
 > ⚠️ **Read these as signals, not statistics.** Every data point is self-reported on Reddit and
 > unverified. Approved cases get shared far more than denials, so the approval rate shown is biased
@@ -44,4 +44,4 @@ original public Reddit thread.
 
 Free for non-commercial use under the [PolyForm Noncommercial License 1.0.0](LICENSE.md).
 
-Built by Shawn Xiang. Not affiliated with USCIS or Reddit, and not legal advice.
+Not affiliated with USCIS or Reddit, and not legal advice.

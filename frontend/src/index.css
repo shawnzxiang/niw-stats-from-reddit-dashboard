@@ -33,6 +33,15 @@ header h1 { margin: 0 0 6px; font-size: 27px; font-weight: 600; letter-spacing: 
 .sub { color: var(--muted); font-size: 13px; margin: 0; line-height: 1.5; }
 .sub .warn { color: #c07a2a; }
 
+.app-header { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; flex-wrap: wrap; }
+.app-header-text { min-width: 0; }
+.download-btn {
+  flex: none; border: 1px solid var(--line-strong); background: var(--card); color: var(--ink);
+  padding: 9px 16px; border-radius: 980px; cursor: pointer; font-size: 13px; font-weight: 500;
+  white-space: nowrap; transition: background .15s ease, border-color .15s ease;
+}
+.download-btn:hover { background: rgba(108, 99, 181, 0.06); border-color: var(--blue); }
+
 .quality-banner {
   border: 1px solid rgba(212, 150, 60, 0.28);
   background: rgba(252, 247, 238, 0.85);
@@ -219,6 +228,13 @@ select.seg {
 .ptable tbody tr.audit-row > td { padding: 0 10px 12px; white-space: normal; }
 .link-button { border: 0; background: none; color: var(--blue); cursor: pointer; padding: 0; text-align: left; font: inherit; }
 .link-button:hover { text-decoration: underline; }
+/* Always-visible "See on Reddit" link on each post row (Reddit-orange pill). */
+.reddit-link {
+  display: inline-block; margin: 5px 8px 0 0; font-size: 11px; font-weight: 600;
+  background: #fdece4; color: #d93900; border-radius: 6px; padding: 2px 9px;
+  text-decoration: none; white-space: nowrap;
+}
+.reddit-link:hover { background: #fbdccd; }
 
 .badge { display: inline-block; padding: 2px 9px; border-radius: 980px; font-size: 11px; font-weight: 500; text-transform: capitalize; }
 .badge.approved { background: #e3f1ec; color: #2a7d63; }
@@ -270,4 +286,5 @@ select.seg {
   .filter-bar-label { flex-basis: 100%; }
   .filter-select { flex: 1 1 calc(50% - 5px); }
   .filter-select select.seg { max-width: none; width: 100%; }
+  .download-btn { width: 100%; text-align: center; }
 }

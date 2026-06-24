@@ -185,6 +185,18 @@ export function PostList({ records }: { records: SlimRecord[] }) {
                           <button type="button" className="link-button" onClick={() => setSelectedId(rowKey)}>
                             {r.title ?? "(view post)"}
                           </button>
+                          {r.permalink && (
+                            <a
+                              href={`https://www.reddit.com${r.permalink}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="reddit-link"
+                              onClick={(e) => e.stopPropagation()}
+                              title="Open the original post on Reddit"
+                            >
+                              See on Reddit ↗
+                            </a>
+                          )}
                           {r.refiled && r.refiled_url && (
                             <a
                               href={`https://www.reddit.com${r.refiled_url}`}

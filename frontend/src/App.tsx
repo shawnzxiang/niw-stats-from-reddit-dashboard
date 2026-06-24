@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 import { loadSnapshot } from "./api/client";
+import { downloadCsv, toCSV } from "./lib/csv";
 import { ChartCard } from "./components/ChartCard";
 import { BiasBanner, CompletenessStrip, DataQualityBanner } from "./components/DataQuality";
 import { DistributionChart } from "./components/DistributionChart";
@@ -214,6 +215,8 @@ export default function App() {
   const refreshedAt = typeof meta.last_refresh === "number" || typeof meta.last_refresh === "string"
     ? meta.last_refresh
     : snapshot.generated_at;
+  const latestPostUtc = metaNumber("latest_post_utc");
+  const downloadDate = new Date((latestPostUtc ?? snapshot.generated_at) * 1000).toISOString().slice(0, 10);
   const setHideAll = (v: boolean) => setHide(Object.fromEntries(ALL_IDS.map((id) => [id, v])));
   const allHidden = ALL_IDS.every((id) => hide[id]);
 
@@ -256,15 +259,26 @@ export default function App() {
 
   return (
     <div className="wrap">
-      <header>
-        <h1>r/EB2_NIW — approval / denial data points</h1>
-        <p className="sub">
-          {classifiedCount.toLocaleString()} active decisions · {processedCount.toLocaleString()} /{" "}
-          {candidateCount.toLocaleString()} candidates processed
-          {pendingCount ? ` · ${pendingCount.toLocaleString()} pending` : ""} · refreshed{" "}
-          {fmtDateTime(refreshedAt)}
-          {debug ? ` · model ${viewLabel} ${version}` : ""}
-        </p>
+      <header className="app-header">
+        <div className="app-header-text">
+          <h1>r/EB2_NIW — approval / denial data points</h1>
+          <p className="sub">
+            {classifiedCount.toLocaleString()} active decisions · {processedCount.toLocaleString()} /{" "}
+            {candidateCount.toLocaleString()} candidates processed
+            {pendingCount ? ` · ${pendingCount.toLocaleString()} pending` : ""} · refreshed{" "}
+            {fmtDateTime(refreshedAt)}
+            {latestPostUtc ? ` · newest post ${new Date(latestPostUtc * 1000).toISOString().slice(0, 10)}` : ""}
+            {debug ? ` · model ${viewLabel} ${version}` : ""}
+          </p>
+        </div>
+        <button
+          type="button"
+          className="download-btn"
+          onClick={() => downloadCsv(`niw-eb2-data-${downloadDate}.csv`, toCSV(filtered))}
+          title="Download the currently shown decisions as a CSV (opens in Excel / Google Sheets)"
+        >
+          ⬇ Download CSV
+        </button>
       </header>
 
       <BiasBanner />

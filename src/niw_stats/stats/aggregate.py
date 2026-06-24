@@ -83,7 +83,33 @@ def _row_get(row, key, default=None):
         return default
 
 
+# NIW premium processing guarantees a decision within ~45 calendar days, so a case that took
+# far longer was almost certainly *regular* even when the OP didn't say so. Fill that in when
+# premium status is unstated and there's no RFE on record (premium + RFE can legitimately run long).
+PREMIUM_INFER_DAYS = 90
+
+
+def infer_premium(
+    premium: bool | None, processing_days: int | None, days_known: bool, was_rfed: bool | None
+) -> bool | None:
+    if (
+        premium is None
+        and days_known
+        and processing_days is not None
+        and processing_days > PREMIUM_INFER_DAYS
+        and was_rfed is not True
+    ):
+        return False  # regular, inferred from a processing time far past the premium guarantee
+    return premium
+
+
 def record_from_row(row) -> Record:
+    premium = infer_premium(
+        _int_to_bool(row["premium_processing"]),
+        row["processing_days"],
+        bool(row["processing_days_known"]),
+        _int_to_bool(row["was_rfed"]),
+    )
     return Record(
         created_utc=row["created_utc"],
         outcome=row["outcome"],
@@ -107,7 +133,7 @@ def record_from_row(row) -> Record:
         title=row["title"],
         permalink=row["permalink"],
         flair=row["flair"],
-        premium_processing=_int_to_bool(row["premium_processing"]),
+        premium_processing=premium,
         was_rfed=_int_to_bool(row["was_rfed"]),
         rfe_date=row["rfe_date"],
         rfe_response_date=row["rfe_response_date"],

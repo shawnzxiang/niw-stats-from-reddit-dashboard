@@ -26,6 +26,7 @@ def test_build_snapshot_contains_only_active_ok(db):
     assert rec["degree"] == "PhD"
     assert rec["citations"] == [None, False]  # [value, known] slim shape
     assert snap["meta"]["excluded_count"] == 1
+    assert snap["meta"]["latest_post_utc"] == 1_700_000_000  # newest post date for data-freshness display
 
 
 def test_data_version_is_stable_until_data_changes(db):

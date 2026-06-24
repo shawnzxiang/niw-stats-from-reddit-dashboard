@@ -218,3 +218,18 @@ def test_slim_roundtrip_preserves_zero_vs_unknown():
     assert back.publications is None and back.publications_known is False
     assert back.degree == "PhD" and back.field_normalized == "CS/AI"
     assert back.profession_raw == "Research scientist"
+
+
+def test_infer_premium_from_long_processing():
+    # Unstated premium + processing far past the ~45-day guarantee, no RFE -> inferred regular.
+    assert agg.infer_premium(None, 200, True, False) is False
+    assert agg.infer_premium(None, 200, True, None) is False  # unknown RFE still inferred regular
+    # An RFE on record -> premium + RFE can legitimately run long, so do NOT infer.
+    assert agg.infer_premium(None, 200, True, True) is None
+    # Near/within the guarantee window -> stays unknown (gray zone).
+    assert agg.infer_premium(None, 60, True, False) is None
+    # Unknown processing days -> can't infer.
+    assert agg.infer_premium(None, None, False, False) is None
+    # Explicitly stated values are never overridden.
+    assert agg.infer_premium(True, 300, True, False) is True
+    assert agg.infer_premium(False, 10, True, False) is False

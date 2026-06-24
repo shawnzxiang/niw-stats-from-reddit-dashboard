@@ -123,6 +123,9 @@ def build_snapshot(conn: sqlite3.Connection, settings: Settings, *, generated_at
             "runs": runs,
             "all_runs": all_runs,
             "versions": versions,
+            # Newest post date in the data, so the dashboard can show true data freshness
+            # (distinct from generated_at, which is just when the file was written).
+            "latest_post_utc": max((r.created_utc or 0 for r in records), default=0),
         },
         "records": all_records,
     }

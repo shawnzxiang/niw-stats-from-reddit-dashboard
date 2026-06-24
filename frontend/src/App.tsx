@@ -259,26 +259,16 @@ export default function App() {
 
   return (
     <div className="wrap">
-      <header className="app-header">
-        <div className="app-header-text">
-          <h1>r/EB2_NIW — approval / denial data points</h1>
-          <p className="sub">
-            {classifiedCount.toLocaleString()} active decisions · {processedCount.toLocaleString()} /{" "}
-            {candidateCount.toLocaleString()} candidates processed
-            {pendingCount ? ` · ${pendingCount.toLocaleString()} pending` : ""} · refreshed{" "}
-            {fmtDateTime(refreshedAt)}
-            {latestPostUtc ? ` · newest post ${new Date(latestPostUtc * 1000).toISOString().slice(0, 10)}` : ""}
-            {debug ? ` · model ${viewLabel} ${version}` : ""}
-          </p>
-        </div>
-        <button
-          type="button"
-          className="download-btn"
-          onClick={() => downloadCsv(`niw-eb2-data-${downloadDate}.csv`, toCSV(filtered))}
-          title="Download the currently shown decisions as a CSV (opens in Excel / Google Sheets)"
-        >
-          ⬇ Download CSV
-        </button>
+      <header>
+        <h1>r/EB2_NIW — approval / denial data points</h1>
+        <p className="sub">
+          {classifiedCount.toLocaleString()} active decisions · {processedCount.toLocaleString()} /{" "}
+          {candidateCount.toLocaleString()} candidates processed
+          {pendingCount ? ` · ${pendingCount.toLocaleString()} pending` : ""} · refreshed{" "}
+          {fmtDateTime(refreshedAt)}
+          {latestPostUtc ? ` · newest post ${new Date(latestPostUtc * 1000).toISOString().slice(0, 10)}` : ""}
+          {debug ? ` · model ${viewLabel} ${version}` : ""}
+        </p>
       </header>
 
       <BiasBanner />
@@ -466,6 +456,17 @@ export default function App() {
       </div>
 
       <PostList records={filtered} />
+
+      <div className="download-row">
+        <button
+          type="button"
+          className="download-btn"
+          onClick={() => downloadCsv(`niw-eb2-data-${downloadDate}.csv`, toCSV(filtered))}
+          title="Download the currently shown decisions as a CSV (opens in Excel / Google Sheets)"
+        >
+          ⬇ Download CSV ({filtered.length.toLocaleString()} rows)
+        </button>
+      </div>
 
       <footer className="credit">
         Created by{" "}

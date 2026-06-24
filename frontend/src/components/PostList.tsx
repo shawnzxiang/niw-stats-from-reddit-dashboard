@@ -3,10 +3,11 @@ import { Fragment, useEffect, useState } from "react";
 import type { KnownPair, SlimRecord } from "../types";
 
 const PAGE_SIZE = 25;
-const COLUMN_COUNT = 13;
+const COLUMN_COUNT = 14;
 // Column widths as % of the table so table-layout:fixed makes it fit any screen; text wraps.
-// Order: Date, Outcome, Degree, Field, Profession, Law firm, Cit., Pubs, Pat., Days, PP, RFE, Post.
-const COL_WIDTHS = ["8%", "7%", "7%", "9%", "10%", "10%", "5%", "5%", "5%", "5%", "6%", "5%", "18%"];
+// Reddit link is FIRST so it's reachable on mobile without scrolling the wide table sideways.
+// Order: Reddit, Date, Outcome, Degree, Field, Profession, Law firm, Cit., Pubs, Pat., Days, PP, RFE, Post.
+const COL_WIDTHS = ["16%", "7%", "6%", "6%", "8%", "9%", "9%", "4%", "4%", "4%", "5%", "4%", "4%", "14%"];
 
 function fmtDate(epoch: number): string {
   return new Date(epoch * 1000).toISOString().slice(0, 10);
@@ -142,6 +143,7 @@ export function PostList({ records }: { records: SlimRecord[] }) {
               </colgroup>
               <thead>
                 <tr>
+                  <th>Reddit</th>
                   <th className="date">Date</th>
                   <th>Outcome</th>
                   <th>Degree</th>
@@ -167,6 +169,20 @@ export function PostList({ records }: { records: SlimRecord[] }) {
                         className={isSelected ? "selected" : ""}
                         onClick={() => setSelectedId(rowKey)}
                       >
+                        <td className="reddit-cell">
+                          {r.permalink && (
+                            <a
+                              href={`https://www.reddit.com${r.permalink}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="reddit-link"
+                              onClick={(e) => e.stopPropagation()}
+                              title="Open the original post on Reddit"
+                            >
+                              See on Reddit ↗
+                            </a>
+                          )}
+                        </td>
                         <td className="date">{fmtDate(r.created_utc)}</td>
                         <td>
                           <span className={`badge ${r.outcome ?? "none"}`}>{r.outcome ?? "—"}</span>
@@ -185,18 +201,6 @@ export function PostList({ records }: { records: SlimRecord[] }) {
                           <button type="button" className="link-button" onClick={() => setSelectedId(rowKey)}>
                             {r.title ?? "(view post)"}
                           </button>
-                          {r.permalink && (
-                            <a
-                              href={`https://www.reddit.com${r.permalink}`}
-                              target="_blank"
-                              rel="noreferrer"
-                              className="reddit-link"
-                              onClick={(e) => e.stopPropagation()}
-                              title="Open the original post on Reddit"
-                            >
-                              See on Reddit ↗
-                            </a>
-                          )}
                           {r.refiled && r.refiled_url && (
                             <a
                               href={`https://www.reddit.com${r.refiled_url}`}

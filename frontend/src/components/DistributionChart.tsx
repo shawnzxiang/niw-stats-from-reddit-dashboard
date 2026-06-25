@@ -106,7 +106,7 @@ export function DistributionChart({ dist, horizontal = false, onSelect, compact 
   const many = data.length > 6;
   return (
     <ResponsiveContainer width="100%" height={240}>
-      <BarChart data={data} margin={{ left: 0, right: 8, top: 18, bottom: many ? 40 : 8 }} onClick={chartClick}>
+      <BarChart data={data} margin={{ left: 0, right: 8, top: 20, bottom: many ? 40 : 8 }} onClick={chartClick}>
         <XAxis
           dataKey="label"
           tick={{ fontSize: 11, fill: AXIS }}
@@ -117,7 +117,15 @@ export function DistributionChart({ dist, horizontal = false, onSelect, compact 
           textAnchor={many ? "end" : "middle"}
           height={many ? 54 : 24}
         />
-        <YAxis allowDecimals={false} width={32} tick={{ fontSize: 11, fill: AXIS }} axisLine={false} tickLine={false} />
+        {/* ~12% headroom above the tallest bar so the "% approved" label on top never clips. */}
+        <YAxis
+          allowDecimals={false}
+          width={32}
+          tick={{ fontSize: 11, fill: AXIS }}
+          axisLine={false}
+          tickLine={false}
+          domain={[0, (dataMax: number) => Math.max(1, Math.ceil(dataMax * 1.12))]}
+        />
         <Tooltip content={<RateTooltip />} cursor={{ fill: "rgba(0,0,0,0.035)" }} />
         <Bar dataKey="approved" stackId="o" fill={GREEN} style={{ cursor }} isAnimationActive={false} />
         <Bar dataKey="denied" stackId="o" fill={RED} style={{ cursor }} isAnimationActive={false} />

@@ -19,6 +19,9 @@ data/
 *.zst
 *.jsonl
 *.ndjson
+# ...but keep the small synthetic test fixtures (the rules above are for real data dumps).
+!tests/fixtures/*.jsonl
+!tests/fixtures/*.ndjson
 .env
 
 # Generated dashboard data

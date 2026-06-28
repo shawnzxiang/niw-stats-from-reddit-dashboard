@@ -85,7 +85,7 @@ export default function App() {
   const compact = useMediaQuery("(max-width: 560px)");
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [rangeKey, setRangeKey] = useState("36m");
+  const [rangeKey, setRangeKey] = useState("24m");
   const [customStart, setCustomStart] = useState("");
   const [customEnd, setCustomEnd] = useState("");
   const [hide, setHide] = useState<Record<string, boolean>>(() =>

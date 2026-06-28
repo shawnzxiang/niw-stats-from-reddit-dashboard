@@ -33,7 +33,7 @@ export const DURATION_BINS: Bin[] = [
 
 export const UNKNOWN = "Unknown";
 const DAY = 86_400;
-export const RANGE_DAYS: Record<string, number> = { "3m": 90, "6m": 180, "12m": 365, "24m": 730 };
+export const RANGE_DAYS: Record<string, number> = { "3m": 90, "6m": 180, "12m": 365, "24m": 730, "36m": 1095 };
 
 function premiumLabel(v: boolean | null): string | null {
   return v == null ? null : v ? "Premium" : "Regular";

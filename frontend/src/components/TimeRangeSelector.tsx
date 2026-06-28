@@ -12,6 +12,7 @@ const RANGES: [string, string][] = [
   ["6m", "6 months"],
   ["12m", "1 year"],
   ["24m", "2 years"],
+  ["36m", "3 years"],
 ];
 
 export function TimeRangeSelector({ rangeKey, onRange, customStart, customEnd, onCustom, quartersActive = false }: Props) {

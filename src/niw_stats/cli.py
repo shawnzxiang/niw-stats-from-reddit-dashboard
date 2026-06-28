@@ -349,7 +349,7 @@ def refresh(
 
 @app.command()
 def stats(
-    range: str = typer.Option("12m", help="3m | 6m | 12m | 24m"),
+    range: str = typer.Option("12m", help="3m | 6m | 12m | 24m | 36m"),
     run: str | None = typer.Option(None, help="View a specific run_key instead of the composite."),
 ) -> None:
     """Print a quick terminal summary for a time range (composite view by default)."""

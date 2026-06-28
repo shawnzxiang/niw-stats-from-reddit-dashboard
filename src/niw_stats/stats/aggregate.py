@@ -338,7 +338,7 @@ def _bucket_label(value: float, bins: list[tuple[str, int, int | None]]) -> str:
 
 # --- range filtering --------------------------------------------------------
 
-RANGE_DAYS = {"3m": 90, "6m": 180, "12m": 365, "24m": 730}
+RANGE_DAYS = {"3m": 90, "6m": 180, "12m": 365, "24m": 730, "36m": 1095}
 DAY = 86_400
 
 

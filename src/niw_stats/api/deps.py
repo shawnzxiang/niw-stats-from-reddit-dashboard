@@ -91,7 +91,7 @@ def resolve_window(
     ctx: Ctx, range_key: str | None, start: str | None, end: str | None
 ) -> tuple[int | None, int | None]:
     if range_key:
-        if range_key not in ("3m", "6m", "12m", "24m"):
+        if range_key not in ("3m", "6m", "12m", "24m", "36m"):
             raise HTTPException(status_code=422, detail=f"bad range {range_key!r}")
         return window_from_range(range_key, ctx.now)
     s = _parse_date(start, end=False) if start else None

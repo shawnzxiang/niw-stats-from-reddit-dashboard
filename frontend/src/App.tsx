@@ -220,10 +220,16 @@ export default function App() {
   const setHideAll = (v: boolean) => setHide(Object.fromEntries(ALL_IDS.map((id) => [id, v])));
   const allHidden = ALL_IDS.every((id) => hide[id]);
 
+  // Multi-select: toggle a single value within a metric's selection. Removing the last value
+  // drops the metric key entirely (so it reads as "no constraint").
   const toggleFilter = (field: string, label: string) =>
-    setFilters((f) => (f[field] === label ? omit(f, field) : { ...f, [field]: label }));
+    setFilters((f) => {
+      const cur = f[field] ?? [];
+      const next = cur.includes(label) ? cur.filter((v) => v !== label) : [...cur, label];
+      return next.length ? { ...f, [field]: next } : omit(f, field);
+    });
   const setOutcome = (val: string | null) =>
-    setFilters((f) => (val ? { ...f, outcome: val } : omit(f, "outcome")));
+    setFilters((f) => (val ? { ...f, outcome: [val] } : omit(f, "outcome")));
   const toggleQuarter = (q: string) =>
     setQuarters((prev) => {
       const next = new Set(prev);
@@ -243,17 +249,27 @@ export default function App() {
     setFilters((f) => ({ ...pick(f, "outcome") }));
     setOthers({});
   };
-  // Dropdown filters set a metric to an exact value (or clear it); also drop any "Other tail" facet.
-  const setFilter = (metric: string, value: string | null) => {
+  // Dropdown filters toggle one value within a metric; any "Other tail" facet for that metric
+  // is mutually exclusive with explicit picks, so drop it when the picks change.
+  const dropOtherTail = (metric: string) =>
     setOthers((o) => {
       if (!o[metric]) return o;
       const { [metric]: _drop, ...rest } = o;
       return rest;
     });
-    setFilters((f) => (value ? { ...f, [metric]: value } : omit(f, metric)));
+  const toggleFacet = (metric: string, value: string) => {
+    dropOtherTail(metric);
+    toggleFilter(metric, value);
   };
+  const clearFacetMetric = (metric: string) => {
+    dropOtherTail(metric);
+    setFilters((f) => omit(f, metric));
+  };
+  // One chip per selected value (a metric may have several), plus one per active "Other tail".
   const facetChips: [string, string][] = [
-    ...Object.entries(filters).filter(([k]) => k !== "outcome"),
+    ...Object.entries(filters)
+      .filter(([k]) => k !== "outcome")
+      .flatMap(([field, labels]) => labels.map((l) => [field, l] as [string, string])),
     ...Object.keys(others).map((m) => [m, OTHERS] as [string, string]),
   ];
 
@@ -363,7 +379,7 @@ export default function App() {
             ].map(([key, label, val]) => (
               <button
                 key={key as string}
-                className={(filters.outcome ?? "all") === key ? "seg active" : "seg"}
+                className={(filters.outcome?.[0] ?? "all") === key ? "seg active" : "seg"}
                 onClick={() => setOutcome(val as string | null)}
               >
                 {label}
@@ -377,7 +393,13 @@ export default function App() {
         </label>
       </div>
 
-      <FilterBar records={viewRecords} filters={filters} onChange={setFilter} onClear={clearFacets} />
+      <FilterBar
+        records={viewRecords}
+        filters={filters}
+        onToggle={toggleFacet}
+        onClearMetric={clearFacetMetric}
+        onClear={clearFacets}
+      />
 
       {showQuarters && quarterOptions.length > 1 && (
         <div className="chips" style={{ alignItems: "center" }}>
@@ -402,7 +424,7 @@ export default function App() {
             <button
               key={`${field}:${label}`}
               className="chip"
-              onClick={() => (label === OTHERS ? toggleOther(field, []) : setFilters((f) => omit(f, field)))}
+              onClick={() => (label === OTHERS ? toggleOther(field, []) : toggleFilter(field, label))}
             >
               {FIELD_LABELS[field] ?? field}: <strong>{label}</strong> ✕
             </button>
@@ -462,7 +484,6 @@ export default function App() {
                       )
                     : toggleFilter(c.metric, label)
                 }
-                selected={others[c.metric] ? OTHERS : filters[c.metric] ?? null}
               />
             </ChartCard>
           );

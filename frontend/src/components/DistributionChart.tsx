@@ -8,7 +8,6 @@ interface Props {
   horizontal?: boolean;
   color?: string;
   onSelect?: (label: string) => void;
-  selected?: string | null;
   /** Phone layout: bars are too narrow for "78% approved", so label them just "78%". */
   compact?: boolean;
 }

@@ -184,10 +184,36 @@ select.seg {
   align-self: center; font-size: 11px; text-transform: uppercase; letter-spacing: 0.07em;
   color: var(--muted); font-weight: 600;
 }
-.filter-select { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.filter-select { position: relative; display: flex; flex-direction: column; gap: 4px; min-width: 0; }
 .filter-select > span { font-size: 10.5px; color: var(--muted); letter-spacing: 0.02em; }
-.filter-select select.seg { font-size: 12.5px; max-width: 180px; padding: 7px 28px 7px 12px; }
 .filter-clear { align-self: flex-end; }
+
+/* Multi-select dropdown: a trigger button + a checkbox popover. */
+.ms-trigger {
+  display: inline-flex; align-items: center; justify-content: space-between; gap: 8px;
+  min-width: 120px; max-width: 180px; font-size: 12.5px; padding: 7px 10px 7px 12px;
+}
+.ms-summary { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ms-caret { flex: none; font-size: 10px; opacity: 0.6; }
+.ms-menu {
+  position: absolute; top: calc(100% + 4px); left: 0; z-index: 30;
+  min-width: 100%; max-width: 240px; max-height: 280px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 1px;
+  background: var(--card); border: 1px solid var(--line); border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm); padding: 6px;
+}
+.ms-option {
+  display: flex; align-items: center; gap: 8px; cursor: pointer;
+  font-size: 12.5px; color: var(--ink); padding: 5px 8px; border-radius: 8px;
+}
+.ms-option:hover { background: rgba(108, 99, 181, 0.08); }
+.ms-option input { accent-color: var(--blue); margin: 0; }
+.ms-option > span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.ms-clear {
+  align-self: flex-start; background: none; border: none; cursor: pointer;
+  font-size: 11.5px; color: var(--muted); padding: 4px 8px 6px;
+}
+.ms-clear:hover { color: var(--ink); text-decoration: underline; }
 
 .postlist { margin-top: 26px; background: var(--card); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow-sm); }
 .postlist-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }

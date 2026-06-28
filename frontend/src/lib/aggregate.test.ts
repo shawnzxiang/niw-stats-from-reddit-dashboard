@@ -76,35 +76,51 @@ describe("run selection / composite voting parity", () => {
 
 describe("drill-down filters", () => {
   it("filters by outcome", () => {
-    const out = agg.applyFilters(records, { outcome: "approved" });
+    const out = agg.applyFilters(records, { outcome: ["approved"] });
     expect(out.every((r) => r.outcome === "approved")).toBe(true);
     expect(out.length).toBe(records.filter((r) => r.outcome === "approved").length);
   });
 
   it("filters by a citation bucket (finer bins)", () => {
-    const out = agg.applyFilters(records, { citations: "31–50" }); // the record with 50 citations
+    const out = agg.applyFilters(records, { citations: ["31–50"] }); // the record with 50 citations
     expect(out).toHaveLength(1);
     expect(out[0].citations[0]).toBe(50);
   });
 
-  it("combines filters with AND", () => {
-    const out = agg.applyFilters(records, { outcome: "approved", degree: "PhD" });
+  it("combines filters across fields with AND", () => {
+    const out = agg.applyFilters(records, { outcome: ["approved"], degree: ["PhD"] });
     expect(out.every((r) => r.outcome === "approved" && r.degree === "PhD")).toBe(true);
     expect(out.length).toBeGreaterThan(0);
+  });
+
+  it("ORs multiple values within one field (multi-select)", () => {
+    const out = agg.applyFilters(records, { degree: ["PhD", "Masters"] });
+    expect(out.every((r) => r.degree === "PhD" || r.degree === "Masters")).toBe(true);
+    expect(out.length).toBe(
+      records.filter((r) => r.degree === "PhD" || r.degree === "Masters").length,
+    );
+    // The union is at least as large as either single-value filter.
+    expect(out.length).toBeGreaterThanOrEqual(
+      agg.applyFilters(records, { degree: ["PhD"] }).length,
+    );
   });
 
   it("empty filters return everything", () => {
     expect(agg.applyFilters(records, {})).toBe(records);
   });
 
+  it("an empty value list is treated as no constraint", () => {
+    expect(agg.applyFilters(records, { degree: [] })).toBe(records);
+  });
+
   it("filters by Unknown for a categorical field (not-mentioned)", () => {
-    const out = agg.applyFilters(records, { degree: "Unknown" });
+    const out = agg.applyFilters(records, { degree: ["Unknown"] });
     expect(out.every((r) => r.degree == null)).toBe(true);
     expect(out.length).toBe(records.filter((r) => r.degree == null).length);
   });
 
   it("filters by Unknown for a numeric field (not known)", () => {
-    const out = agg.applyFilters(records, { citations: "Unknown" });
+    const out = agg.applyFilters(records, { citations: ["Unknown"] });
     expect(out.every((r) => !r.citations[1])).toBe(true);
   });
 });

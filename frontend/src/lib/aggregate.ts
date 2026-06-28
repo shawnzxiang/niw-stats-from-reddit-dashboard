@@ -378,9 +378,10 @@ export function summary(records: SlimRecord[]) {
 }
 
 // --- drill-down filtering ---------------------------------------------------
-// A filter maps a field key (outcome/degree/field/law_firm or a numeric metric)
-// to the label that must match (categorical value or numeric bucket label).
-export type Filters = Record<string, string>;
+// A filter maps a field key (outcome/degree/field/law_firm or a numeric metric) to the set
+// of labels that may match (categorical values or numeric bucket labels). Multiple values for
+// one field are OR'd; different fields are AND'd. An empty list means "no constraint".
+export type Filters = Record<string, string[]>;
 
 export function bucketLabelFor(metric: string, record: SlimRecord): string {
   const num = NUMERIC[metric];
@@ -396,11 +397,13 @@ export function fieldValue(record: SlimRecord, field: string): string {
 }
 
 export function recordMatchesFilters(record: SlimRecord, filters: Filters): boolean {
-  return Object.entries(filters).every(([field, label]) => fieldValue(record, field) === label);
+  return Object.entries(filters).every(
+    ([field, labels]) => labels.length === 0 || labels.includes(fieldValue(record, field)),
+  );
 }
 
 export function applyFilters(records: SlimRecord[], filters: Filters): SlimRecord[] {
-  if (Object.keys(filters).length === 0) return records;
+  if (!Object.values(filters).some((labels) => labels.length > 0)) return records;
   return records.filter((r) => recordMatchesFilters(r, filters));
 }
 

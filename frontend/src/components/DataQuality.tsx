@@ -29,12 +29,11 @@ export function BiasBanner() {
         ◐
       </span>
       <div className="bias-banner-body">
-        <strong>Directional, not definitive — read these as signals, not statistics.</strong>
+        <strong>This data has a bias: approvals post more.</strong>
         <p>
-          Every data point is <b>self-reported on Reddit and unverified</b>. Approved cases get shared far
-          more than denials, so the approval rate here is <b>biased high</b>. The sample is small and
-          self-selected — use it to get a feel for <i>what kinds of profiles file and how they tend to fare</i>,
-          not to predict your own odds or to stand in for official USCIS numbers.
+          People who get <b>approved</b> are much more likely to post on Reddit than people who get denied,
+          so the approval rate here is <b>higher than reality</b>. All data is self-reported and unverified.
+          Read these charts as rough signals, not exact statistics.
         </p>
       </div>
       <button className="bias-banner-x" onClick={dismiss} aria-label="Dismiss notice" title="Dismiss">

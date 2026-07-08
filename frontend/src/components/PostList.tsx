@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 
+import { effectiveUtc } from "../lib/aggregate";
 import type { KnownPair, SlimRecord } from "../types";
 
 const PAGE_SIZE = 25;
@@ -48,6 +49,8 @@ function MetadataGrid({ record }: { record: SlimRecord }) {
     ["Run", record.run ?? "—"],
     ["Classified", fmtDateTime(record.classified_at)],
     ["Outcome", record.outcome ?? "—"],
+    ["Decision date", record.decision_utc != null ? fmtDate(record.decision_utc) : "—"],
+    ["Posted", fmtDate(record.created_utc)],
     ["Degree", record.degree ?? "—"],
     ["Field", record.field ?? "—"],
     ["Profession", record.profession ?? "—"],
@@ -183,7 +186,16 @@ export function PostList({ records }: { records: SlimRecord[] }) {
                             </a>
                           )}
                         </td>
-                        <td className="date">{fmtDate(r.created_utc)}</td>
+                        <td
+                          className="date"
+                          title={
+                            r.decision_utc != null && fmtDate(r.decision_utc) !== fmtDate(r.created_utc)
+                              ? `Stated I-140 decision date. Posted ${fmtDate(r.created_utc)}`
+                              : undefined
+                          }
+                        >
+                          {fmtDate(effectiveUtc(r))}
+                        </td>
                         <td>
                           <span className={`badge ${r.outcome ?? "none"}`}>{r.outcome ?? "—"}</span>
                         </td>

@@ -453,7 +453,7 @@ export default function App() {
       <div className="card" style={{ marginBottom: 16 }}>
         <div className="card-head">
           <h3>Approval over time</h3>
-          <span className="muted">by quarter · reflects current filters</span>
+          <span className="muted">by quarter · uses stated I-140 decision date, else post date · reflects current filters</span>
         </div>
         <TimeSeriesChart data={series} />
       </div>

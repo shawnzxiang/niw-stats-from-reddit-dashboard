@@ -10,6 +10,7 @@ function num(pair: KnownPair | undefined): string {
 // to the value (blank when "not mentioned"); permalink becomes a full Reddit URL.
 const COLUMNS: [string, (r: SlimRecord) => string][] = [
   ["date", (r) => new Date(r.created_utc * 1000).toISOString().slice(0, 10)],
+  ["i140_decision_date", (r) => (r.decision_utc != null ? new Date(r.decision_utc * 1000).toISOString().slice(0, 10) : "")],
   ["outcome", (r) => r.outcome ?? ""],
   ["degree", (r) => r.degree ?? ""],
   ["field", (r) => r.field ?? ""],

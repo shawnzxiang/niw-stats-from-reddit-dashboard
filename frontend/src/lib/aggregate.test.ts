@@ -124,3 +124,33 @@ describe("drill-down filters", () => {
     expect(out.every((r) => !r.citations[1])).toBe(true);
   });
 });
+
+describe("effective date (stated I-140 decision date, else post date)", () => {
+  // 2026-05-15 post reporting an I-140 decided 2025-03-01 (the I-485-posted-later case).
+  const stale = {
+    created_utc: Date.UTC(2026, 4, 15) / 1000,
+    decision_utc: Date.UTC(2025, 2, 1) / 1000,
+    outcome: "approved",
+  } as unknown as SlimRecord;
+  const fresh = { created_utc: Date.UTC(2026, 4, 20) / 1000, outcome: "denied" } as unknown as SlimRecord;
+
+  it("effectiveUtc prefers decision_utc and falls back to created_utc", () => {
+    expect(agg.effectiveUtc(stale)).toBe(stale.decision_utc);
+    expect(agg.effectiveUtc(fresh)).toBe(fresh.created_utc);
+  });
+
+  it("filterByRange windows on the effective date", () => {
+    const start = Date.UTC(2026, 0, 1) / 1000;
+    expect(agg.filterByRange([stale, fresh], start, null)).toEqual([fresh]);
+    expect(agg.filterByRange([stale, fresh], null, start)).toEqual([stale]);
+  });
+
+  it("quarter functions bucket by the effective date", () => {
+    expect(agg.availableQuarters([stale, fresh])).toEqual(["2026-Q2", "2025-Q1"]);
+    expect(agg.filterByQuarters([stale, fresh], new Set(["2025-Q1"]))).toEqual([stale]);
+    const series = agg.quarterSeries([stale, fresh]);
+    expect(series.map((p) => p.quarter)).toEqual(["2025-Q1", "2026-Q2"]);
+    expect(series[0].approved).toBe(1);
+    expect(series[1].denied).toBe(1);
+  });
+});

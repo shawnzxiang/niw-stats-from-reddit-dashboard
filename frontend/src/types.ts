@@ -6,6 +6,8 @@ export interface SlimRecord {
   permalink: string | null;
   flair: string | null;
   created_utc: number;
+  /** Stated I-140 decision date (epoch, sanity-checked server-side); time bucketing prefers it. */
+  decision_utc?: number | null;
   outcome: string | null;
   degree: string | null;
   field: string | null;

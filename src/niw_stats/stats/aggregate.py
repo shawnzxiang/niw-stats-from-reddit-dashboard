@@ -8,8 +8,10 @@ zeros, which is the whole point of the (value, known) pairs.
 from __future__ import annotations
 
 import hashlib
+import re
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Any
 
 # --- record -----------------------------------------------------------------
@@ -55,6 +57,10 @@ class Record:
     refiled: bool | None = None
     refiled_url: str | None = None
     refile_approval: bool | None = None
+    # Stated I-140 decision date as an epoch (sanity-checked); None when absent/implausible.
+    # Time bucketing prefers this over the post date: an "I-485 approved" post often reports
+    # an I-140 decided long before, and should count in the quarter it was decided.
+    decision_utc: int | None = None
 
 
 def content_fingerprint(records: list[Record], prefix: str = "") -> str:
@@ -66,7 +72,7 @@ def content_fingerprint(records: list[Record], prefix: str = "") -> str:
         h.update(
             f"{r.id}|{r.outcome}|{r.degree}|{r.field_normalized}|{r.profession_normalized}|"
             f"{r.law_firm_normalized}|{r.citations}|{r.publications}|{r.years_experience}|"
-            f"{r.processing_days}|{r.premium_processing}|{r.was_rfed}|{r.run}\n".encode()
+            f"{r.processing_days}|{r.premium_processing}|{r.was_rfed}|{r.run}|{r.decision_utc}\n".encode()
         )
     return h.hexdigest()[:16]
 
@@ -101,6 +107,38 @@ def infer_premium(
     ):
         return False  # regular, inferred from a processing time far past the premium guarantee
     return premium
+
+
+# Sanity bounds for a stated decision date. ~5% of extracted dates land AFTER the post was
+# written (the LLM grabbed a priority/interview/RFE date) — impossible for a reported decision,
+# so those fall back to the post date. Ancient/garbage years are rejected the same way.
+DAY = 86_400
+_DECISION_MIN_UTC = 1_262_304_000  # 2010-01-01
+_DECISION_POST_SLACK = 2 * DAY     # small timezone fuzz past the post time
+_DECISION_MAX_AGE = 5 * 365 * DAY  # decisions >5y before the post are noise
+
+
+def decision_utc_from(decision_date: str | None, created_utc: int | None) -> int | None:
+    """Epoch for a stated YYYY-MM-DD I-140 decision date, or None when absent/implausible."""
+    if not decision_date or created_utc is None:
+        return None
+    m = re.fullmatch(r"(\d{4})-(\d{2})-(\d{2})", decision_date.strip())
+    if not m:
+        return None
+    try:
+        ts = int(datetime(int(m[1]), int(m[2]), int(m[3]), tzinfo=timezone.utc).timestamp())
+    except ValueError:
+        return None
+    if ts > created_utc + _DECISION_POST_SLACK:
+        return None
+    if ts < max(_DECISION_MIN_UTC, created_utc - _DECISION_MAX_AGE):
+        return None
+    return ts
+
+
+def effective_utc(r: Record) -> int:
+    """The date a record counts under: stated I-140 decision date, else the post date."""
+    return r.decision_utc if r.decision_utc is not None else r.created_utc
 
 
 def record_from_row(row) -> Record:
@@ -144,6 +182,7 @@ def record_from_row(row) -> Record:
         selftext=_row_get(row, "selftext"),
         op_comments=_row_get(row, "op_comments"),
         author=_row_get(row, "author"),
+        decision_utc=decision_utc_from(_row_get(row, "decision_date"), row["created_utc"]),
     )
 
 
@@ -155,6 +194,7 @@ def to_slim(r: Record) -> dict[str, Any]:
         "permalink": r.permalink,
         "flair": r.flair,
         "created_utc": r.created_utc,
+        "decision_utc": r.decision_utc,
         "outcome": r.outcome,
         "degree": r.degree,
         "field": r.field_normalized,
@@ -224,6 +264,7 @@ def record_from_slim(d: dict[str, Any]) -> Record:
         prompt_version=d.get("prompt_version"), schema_version=d.get("schema_version"),
         selftext=d.get("selftext"), op_comments=d.get("op_comments"),
         author=d.get("author"), refiled=d.get("refiled"), refiled_url=d.get("refiled_url"),
+        decision_utc=d.get("decision_utc"),
     )
 
 
@@ -339,7 +380,6 @@ def _bucket_label(value: float, bins: list[tuple[str, int, int | None]]) -> str:
 # --- range filtering --------------------------------------------------------
 
 RANGE_DAYS = {"3m": 90, "6m": 180, "12m": 365, "24m": 730, "36m": 1095}
-DAY = 86_400
 
 
 def window_from_range(range_key: str, now: int) -> tuple[int, int]:
@@ -348,8 +388,10 @@ def window_from_range(range_key: str, now: int) -> tuple[int, int]:
 
 
 def filter_by_range(records: list[Record], start: int | None, end: int | None) -> list[Record]:
+    """Time window over the EFFECTIVE date (stated decision date when available, else post date)."""
     def ok(r: Record) -> bool:
-        return (start is None or r.created_utc >= start) and (end is None or r.created_utc <= end)
+        ts = effective_utc(r)
+        return (start is None or ts >= start) and (end is None or ts <= end)
 
     return [r for r in records if ok(r)]
 

@@ -24,6 +24,50 @@ def test_filter_by_range():
     assert len(agg.filter_by_range(recs, None, None)) == 3
 
 
+def test_filter_by_range_prefers_stated_decision_date():
+    # An I-485 post from "now" whose I-140 was decided long ago must count at the decision date.
+    stale = mk(created_utc=1_700_000_000, decision_utc=1_600_000_000)
+    fresh = mk(created_utc=1_700_000_000)
+    got = agg.filter_by_range([stale, fresh], 1_650_000_000, 1_750_000_000)
+    assert got == [fresh]
+    got = agg.filter_by_range([stale, fresh], 1_550_000_000, 1_650_000_000)
+    assert got == [stale]
+
+
+def test_decision_utc_from_parses_and_bounds():
+    post = 1_750_000_000  # 2025-06-15
+    # a valid decision date shortly before the post
+    assert agg.decision_utc_from("2025-06-01", post) == 1_748_736_000
+    # absent / malformed / partial dates -> None
+    assert agg.decision_utc_from(None, post) is None
+    assert agg.decision_utc_from("", post) is None
+    assert agg.decision_utc_from("2025-06", post) is None
+    assert agg.decision_utc_from("June 1, 2025", post) is None
+    assert agg.decision_utc_from("2025-13-40", post) is None
+    # decision AFTER the post is an extraction error -> None (2 day slack allowed)
+    assert agg.decision_utc_from("2025-09-01", post) is None
+    assert agg.decision_utc_from("2025-06-16", post) is not None  # within slack
+    # ancient / garbage years -> None
+    assert agg.decision_utc_from("2009-01-01", post) is None
+    assert agg.decision_utc_from("1998-01-01", post) is None
+    # >5 years before the post -> None
+    assert agg.decision_utc_from("2019-01-01", post) is None
+
+
+def test_effective_utc_falls_back_to_post_date():
+    assert agg.effective_utc(mk(created_utc=123)) == 123
+    assert agg.effective_utc(mk(created_utc=123, decision_utc=77)) == 77
+
+
+def test_slim_carries_decision_utc():
+    r = mk(created_utc=200, decision_utc=100)
+    d = agg.to_slim(r)
+    assert d["decision_utc"] == 100
+    assert agg.record_from_slim(d).decision_utc == 100
+    # public slim keeps it too (a date is not PII)
+    assert agg.to_slim_public(r)["decision_utc"] == 100
+
+
 def test_window_from_range():
     assert agg.window_from_range("3m", 1_000_000) == (1_000_000 - 90 * 86400, 1_000_000)
     assert agg.window_from_range("24m", 1_000_000) == (1_000_000 - 730 * 86400, 1_000_000)

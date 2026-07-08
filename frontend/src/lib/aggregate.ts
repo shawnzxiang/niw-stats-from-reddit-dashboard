@@ -176,17 +176,24 @@ export function markRefiled(records: SlimRecord[]): SlimRecord[] {
   return records;
 }
 
+/** The date a record counts under: stated I-140 decision date when available, else post date.
+ * An "I-485 approved" post often reports an I-140 decided long before the post was written. */
+export function effectiveUtc(r: SlimRecord): number {
+  return r.decision_utc ?? r.created_utc;
+}
+
 export function filterByRange(
   records: SlimRecord[],
   start: number | null,
   end: number | null,
 ): SlimRecord[] {
-  return records.filter(
-    (r) => (start === null || r.created_utc >= start) && (end === null || r.created_utc <= end),
-  );
+  return records.filter((r) => {
+    const ts = effectiveUtc(r);
+    return (start === null || ts >= start) && (end === null || ts <= end);
+  });
 }
 
-// --- year/quarter filtering (post date) -------------------------------------
+// --- year/quarter filtering (decision date when stated, else post date) ------
 
 export function quarterKey(epoch: number): string {
   const d = new Date(epoch * 1000);
@@ -196,13 +203,13 @@ export function quarterKey(epoch: number): string {
 /** Distinct quarter keys present in the records, newest first (e.g. "2026-Q2"). */
 export function availableQuarters(records: SlimRecord[]): string[] {
   const seen = new Set<string>();
-  for (const r of records) seen.add(quarterKey(r.created_utc));
+  for (const r of records) seen.add(quarterKey(effectiveUtc(r)));
   return [...seen].sort((a, b) => (a < b ? 1 : a > b ? -1 : 0));
 }
 
 export function filterByQuarters(records: SlimRecord[], keys: Set<string>): SlimRecord[] {
   if (keys.size === 0) return records;
-  return records.filter((r) => keys.has(quarterKey(r.created_utc)));
+  return records.filter((r) => keys.has(quarterKey(effectiveUtc(r))));
 }
 
 export interface QuarterPoint {
@@ -216,7 +223,7 @@ export interface QuarterPoint {
 export function quarterSeries(records: SlimRecord[]): QuarterPoint[] {
   const m = new Map<string, { approved: number; denied: number }>();
   for (const r of records) {
-    const q = quarterKey(r.created_utc);
+    const q = quarterKey(effectiveUtc(r));
     let s = m.get(q);
     if (!s) {
       s = { approved: 0, denied: 0 };

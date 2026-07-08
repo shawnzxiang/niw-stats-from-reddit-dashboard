@@ -47,6 +47,7 @@ REMOTE="$(git remote get-url origin)"
 (
   cd frontend/dist
   touch .nojekyll                # belt-and-suspenders: stop GitHub Pages' Jekyll from eating /assets
+  rm -rf .git                    # Vite preserves dist/.git across builds, so drop last deploy's repo
   git init -q
   git checkout -q -b gh-pages
   git add -A

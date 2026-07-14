@@ -10,6 +10,7 @@ import { PostList } from "./components/PostList";
 import { StatCards } from "./components/StatCards";
 import { TimeRangeSelector } from "./components/TimeRangeSelector";
 import { TimeSeriesChart } from "./components/TimeSeriesChart";
+import { ViewCounter } from "./components/ViewCounter";
 import {
   COMPOSITE,
   FIELD_LABELS,
@@ -507,6 +508,7 @@ export default function App() {
         Created by{" "}
         <a href="https://www.reddit.com/user/x_shawn" target="_blank" rel="noreferrer">u/x_shawn</a>
         {" "}· data from r/EB2_NIW via Arctic Shift
+        <ViewCounter />
       </footer>
     </div>
   );

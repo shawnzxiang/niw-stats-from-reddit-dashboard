@@ -26,11 +26,47 @@ export NIW_PUBLIC_SNAPSHOT=1
 BACKEND="${1:-claude-cli}"
 HEALTHCHECK_URL="${NIW_HEALTHCHECK_URL:-}"
 
+# "<processed> <failed>" for the active prompt/schema version (same numbers `niw status` shows).
+# Used to diff the classify batch around compute.sh so a broken run can't deploy silently.
+classify_counts() {
+  PYTHONPATH=src .venv/bin/python -c '
+from niw_stats.classify.service import COMPOSITE, active_identity
+from niw_stats.config import get_settings
+from niw_stats.db import connection
+from niw_stats.db import repository as repo
+
+s = get_settings()
+conn = connection.connect(s.db_path)
+try:
+    pv, sv, view_run = active_identity(s, conn)
+    c = repo.counts(conn, pv, sv, None if view_run == COMPOSITE else view_run)
+finally:
+    conn.close()
+print(c["active_processed_count"], c["failed_count"])
+'
+}
+
 echo "===== publish start: $(date -u '+%Y-%m-%dT%H:%M:%SZ')  backend=${BACKEND} ====="
 
 # 1. Compute: incremental ingest + classify (only NEW posts) + write frontend/public/snapshot.json.
 #    Uses your already-logged-in local `claude` CLI — $0 marginal on your subscription.
+read -r PRE_PROCESSED PRE_FAILED < <(classify_counts || echo "0 0")
 ./compute.sh "$BACKEND"
+read -r POST_PROCESSED POST_FAILED < <(classify_counts)
+
+# 1b. Deploy gate: if this batch mostly failed to classify (expired `claude` login, API outage),
+#     abort BEFORE build/deploy so launchd exits non-zero and the healthcheck ping never fires --
+#     otherwise a dead classifier silently force-pushes a stale snapshot and reports "healthy".
+#     Threshold: abort when >=20% of the batch failed (covers the observed all-failed OAuth case
+#     while tolerating the occasional one-off timeout on a long post).
+BATCH=$((POST_PROCESSED - PRE_PROCESSED)); [ "$BATCH" -lt 0 ] && BATCH=0
+NEW_FAILED=$((POST_FAILED - PRE_FAILED)); [ "$NEW_FAILED" -lt 0 ] && NEW_FAILED=0
+echo "classify batch: ${BATCH} posts, ${NEW_FAILED} new failures (${POST_FAILED} failed total)"
+if [ "$NEW_FAILED" -gt 0 ] && [ $((NEW_FAILED * 5)) -ge "$BATCH" ]; then
+  echo "ABORT: ${NEW_FAILED}/${BATCH} of this batch failed to classify; refusing to deploy." >&2
+  echo "       Check \`claude\` CLI auth (run: claude /login), delete the failed rows, re-run." >&2
+  exit 1
+fi
 
 # 2. Build the static site. `make build-frontend` runs `niw snapshot` then `vite build` and copies
 #    snapshot.json into frontend/dist. With base="./" in vite.config.ts the asset paths are relative,

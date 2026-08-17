@@ -36,6 +36,13 @@
         <!-- Optional dead-man's-switch: paste your https://hc-ping.com/<uuid> here. -->
         <key>NIW_HEALTHCHECK_URL</key>
         <string></string>
+        <!-- REQUIRED: the live dataset's run key is claude-cli/haiku. Without this the
+             default model (sonnet) opens a NEW run and re-classifies everything from scratch. -->
+        <key>NIW_CLAUDE_MODEL</key>
+        <string>haiku</string>
+        <!-- Long posts time out at the default 120s; 240s avoids spurious failures. -->
+        <key>NIW_CLASSIFY_TIMEOUT_SEC</key>
+        <string>240</string>
     </dict>
 
     <key>ProgramArguments</key>

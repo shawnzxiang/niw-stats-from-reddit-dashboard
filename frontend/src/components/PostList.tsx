@@ -43,6 +43,34 @@ function sourceText(record: SlimRecord): string {
   return parts.filter((p): p is string => p !== null).join("\n");
 }
 
+function redditUrl(record: SlimRecord): string | null {
+  return record.permalink ? `https://www.reddit.com${record.permalink}` : null;
+}
+// The public snapshot drops post body and OP comments (privacy), so there is nothing to show inline.
+function hasStoredText(record: SlimRecord): boolean {
+  return Boolean(record.selftext?.trim() || record.op_comments?.trim());
+}
+
+function NoStoredText({ record }: { record: SlimRecord }) {
+  const url = redditUrl(record);
+  return (
+    <div className="audit-nobody">
+      <p className="audit-nobody-title">{record.title ?? "Untitled post"}</p>
+      {record.flair && <p className="muted">Flair: {record.flair}</p>}
+      {url ? (
+        <>
+          <p className="muted">This site does not store post text. Read the full post and comments on Reddit.</p>
+          <a className="reddit-link" href={url} target="_blank" rel="noreferrer">
+            Read on Reddit
+          </a>
+        </>
+      ) : (
+        <p className="muted">Post text is not available.</p>
+      )}
+    </div>
+  );
+}
+
 function MetadataGrid({ record }: { record: SlimRecord }) {
   const rows: [string, string][] = [
     ["Version", version(record)],
@@ -91,13 +119,13 @@ function AuditPane({ record }: { record: SlimRecord }) {
       <div className="audit-col source">
         <div className="audit-head">
           <h4>Post text</h4>
-          {record.permalink && (
+          {hasStoredText(record) && record.permalink && (
             <a href={`https://www.reddit.com${record.permalink}`} target="_blank" rel="noreferrer">
               Open Reddit
             </a>
           )}
         </div>
-        <pre>{sourceText(record)}</pre>
+        {hasStoredText(record) ? <pre>{sourceText(record)}</pre> : <NoStoredText record={record} />}
       </div>
     </div>
   );

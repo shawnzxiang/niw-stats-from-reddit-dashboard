@@ -62,4 +62,17 @@ describe("PostList", () => {
     expect(newestRow?.nextElementSibling).toHaveClass("audit-row");
     expect(container.querySelectorAll(".audit-row")).toHaveLength(1);
   });
+
+  it("links to Reddit instead of showing a placeholder when the post text is not stored", () => {
+    const publicRecord = { ...record("pub1", "Approved after RFE", 1_781_490_000), selftext: null };
+    render(<PostList records={[publicRecord]} />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Approved after RFE" }));
+    const pane = screen.getByText("Extracted metadata").closest(".audit-pane") as HTMLElement;
+    expect(within(pane).queryByText(/body unavailable/)).not.toBeInTheDocument();
+    expect(within(pane).getByRole("link", { name: "Read on Reddit" })).toHaveAttribute(
+      "href",
+      "https://www.reddit.com/r/EB2_NIW/comments/pub1/",
+    );
+  });
 });

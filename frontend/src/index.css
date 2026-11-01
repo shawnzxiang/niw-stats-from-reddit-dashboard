@@ -238,6 +238,13 @@ select.seg {
   background: var(--card); border: 1px solid var(--line); border-radius: 12px;
   white-space: pre-wrap; font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
 }
+.audit-nobody {
+  padding: 14px; background: var(--card); border: 1px solid var(--line); border-radius: 12px;
+  display: flex; flex-direction: column; align-items: flex-start; gap: 8px;
+}
+.audit-nobody p { margin: 0; font-size: 13px; line-height: 1.45; }
+.audit-nobody .audit-nobody-title { font-weight: 600; color: var(--ink); }
+.audit-nobody .reddit-link { font-size: 12.5px; padding: 5px 12px; }
 .ptable-wrap { overflow-x: auto; }
 /* Fixed layout + colgroup %widths => the table always fits its container; text columns wrap. */
 .ptable { width: 100%; border-collapse: collapse; font-size: 13px; table-layout: fixed; }
